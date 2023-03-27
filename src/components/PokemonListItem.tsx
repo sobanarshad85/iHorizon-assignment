@@ -23,7 +23,10 @@ function PokemonListItem({name, index, url, navigation}: PokemonListItemProps) {
       <Separator height={1} />
       <View style={styles.subContainer}>
         <View style={styles.imageContainer}>
-          <Image source={{uri: imageUrl}} style={styles.image} />
+          <Image
+            source={{uri: imageUrl}}
+            style={url ? styles.image : styles.image1}
+          />
         </View>
         <Text style={styles.name}>{name}</Text>
       </View>
@@ -51,6 +54,10 @@ const styles = StyleSheet.create({
   image: {
     height: 50,
     width: 50,
+  },
+  image1: {
+    height: 40,
+    width: 40,
   },
   name: {
     flex: 2,
