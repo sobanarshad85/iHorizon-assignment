@@ -7,6 +7,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '../screens/Home/index.tsx';
 import {HOME, POKEMON_DETAILS} from '../constants';
 import PokemonDetails from '../screens/PokemonDetails';
+import {makeFirstCharCapital} from '../utils';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,7 +16,13 @@ function Screens() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name={HOME} component={HomeScreen} />
-        <Stack.Screen name={POKEMON_DETAILS} component={PokemonDetails} />
+        <Stack.Screen
+          name={POKEMON_DETAILS}
+          component={PokemonDetails}
+          options={({route}) => ({
+            title: makeFirstCharCapital(route.params.name),
+          })}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

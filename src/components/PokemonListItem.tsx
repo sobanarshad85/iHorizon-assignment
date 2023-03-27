@@ -1,27 +1,29 @@
 import React from 'react';
 import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
-import {POKEMON_DETAILS} from '../constants';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {POKEMON_DETAILS} from '../constants';
 import Separator from './Separator';
 
-interface Props {
+interface PokemonListItemProps {
   name: string;
-  navigation: NavigationProp<ParamListBase>;
   index: number;
+  url?: string;
+  navigation: NavigationProp<ParamListBase>;
 }
 
-function PokemonListItem({name, index, navigation}: Props) {
+function PokemonListItem({name, index, url, navigation}: PokemonListItemProps) {
   const imageUrl =
-    'https://images.unsplash.com/photo-1526045612212-70caf35c14df';
+    url ??
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png';
+
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate(POKEMON_DETAILS, {index})}
-      style={styles.container}
-      key={name}>
+      onPress={() => navigation.navigate(POKEMON_DETAILS, {index, name})}
+      style={styles.container}>
       <Separator height={1} />
       <View style={styles.subContainer}>
         <View style={styles.imageContainer}>
-          <Image source={{uri: imageUrl}} style={{height: 30, width: 30}} />
+          <Image source={{uri: imageUrl}} style={styles.image} />
         </View>
         <Text style={styles.name}>{name}</Text>
       </View>
@@ -39,11 +41,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 10,
     flex: 1,
+    alignItems: 'center',
   },
   imageContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  image: {
+    height: 50,
+    width: 50,
   },
   name: {
     flex: 2,

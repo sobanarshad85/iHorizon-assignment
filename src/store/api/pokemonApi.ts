@@ -7,6 +7,10 @@ export interface Pokemon {
 
 export interface PokemonDetails {
   name: string;
+  height: number;
+  id: number;
+  weight: number;
+  types: { type: { name: string } }[]
   sprites: {
     front_default: string;
   };
@@ -27,4 +31,4 @@ export const pokemonApi = createApi({
   }),
 });
 
-export const { useGetPokemonListQuery, useGetPokemonDetailsQuery } = pokemonApi;
+export const { useGetPokemonListQuery, useLazyGetPokemonDetailsQuery } = pokemonApi;

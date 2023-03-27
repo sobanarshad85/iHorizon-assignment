@@ -1,15 +1,19 @@
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Pokemon, useGetPokemonListQuery} from '../../store/api/pokemonApi';
-import {selectPokemonList, fetchPokemonList} from '../../store/pokemonSlice';
-import {View, StyleSheet, VirtualizedList} from 'react-native';
-import PokemonListItem from '../../components/PokemonListItem';
 import {
   NavigationProp,
   useNavigation,
   ParamListBase,
 } from '@react-navigation/native';
 import {RootState} from '../../store';
+import {Pokemon, useGetPokemonListQuery} from '../../store/api/pokemonApi';
+import {
+  fetchPokemonList,
+  selectPokemonDetails,
+  selectPokemonList,
+} from '../../store/pokemonSlice';
+import {View, StyleSheet, VirtualizedList} from 'react-native';
+import PokemonListItem from '../../components/PokemonListItem';
 import Error from '../../components/Error';
 import Loading from '../../components/Loading';
 
@@ -20,11 +24,17 @@ type Item = {
 
 function PokemonList() {
   const dispatch = useDispatch();
+  const navigation: NavigationProp<ParamListBase> = useNavigation();
+
+  // Selectors
   const pokemonList = useSelector((state: RootState) =>
     selectPokemonList(state),
   );
-  const navigation: NavigationProp<ParamListBase> = useNavigation();
+  const pokemonDetails = useSelector((state: RootState) =>
+    selectPokemonDetails(state),
+  );
 
+  // API Query
   const {
     data: pokemonData,
     error: pokemonError,
@@ -32,28 +42,45 @@ function PokemonList() {
     refetch: refetchPokemonData,
   }: any = useGetPokemonListQuery();
 
+  // Fetch data on component mount
   useEffect(() => {
     if (pokemonData) {
       dispatch(fetchPokemonList(pokemonData.results));
     }
   }, [pokemonData, dispatch]);
 
-  if (pokemonError)
+  // Error handling
+  if (pokemonError) {
     return <Error retry={refetchPokemonData} error={pokemonError} />;
+  }
 
-  const renderItem = ({item, index}: Item) => (
-    <PokemonListItem name={item.name} index={index} navigation={navigation} />
-  );
+  // Render functions
+  const renderItem = ({item, index}: Item) => {
+    const image = pokemonDetails[index + 1]?.sprites?.front_default;
+    return (
+      <PokemonListItem
+        url={image}
+        name={item.name}
+        index={index}
+        navigation={navigation}
+      />
+    );
+  };
+
+  const renderFooter = () => {
+    if (isPokemonDataLoading) {
+      return <Loading />;
+    }
+    return null;
+  };
+
+  // VirtualizedList
   const getItem = (data: Pokemon[], index: number) => data[index];
   const getItemCount = (data: Pokemon[]) => data.length;
   const onEndReached = () => {
-    if (!isPokemonDataLoading) {
-    }
+    // TODO: Perform action on end reached
   };
-  const renderFooter = () => {
-    if (isPokemonDataLoading) return <Loading />;
-    return null;
-  };
+
   return (
     <View style={styles.container}>
       <VirtualizedList
