@@ -1,7 +1,4 @@
-// In App.js in a new project
-
 import * as React from 'react';
-import {View, Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '../screens/Home/index.tsx';
@@ -14,8 +11,20 @@ const Stack = createNativeStackNavigator();
 function Screens() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name={HOME} component={HomeScreen} />
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#2E7DF6',
+          },
+          headerTintColor: '#fff',
+        }}>
+        <Stack.Screen
+          name={HOME}
+          component={HomeScreen}
+          options={{
+            title: 'PokeReact',
+          }}
+        />
         <Stack.Screen
           name={POKEMON_DETAILS}
           component={PokemonDetails}
