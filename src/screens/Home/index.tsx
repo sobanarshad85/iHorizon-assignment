@@ -1,14 +1,8 @@
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useGetPokemonListQuery} from '../../store/api/pokemonApi';
-import {
-  selectPokemonList,
-  fetchPokemonList,
-  selectPokemonListError,
-  selectPokemonListStatus,
-  setPokemonListStatus,
-} from '../../store/pokemonSlice';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {selectPokemonList, fetchPokemonList} from '../../store/pokemonSlice';
+import {View, StyleSheet} from 'react-native';
 import PokemonListItem from '../../components/PokemonListItem';
 import {
   NavigationProp,
@@ -17,6 +11,7 @@ import {
 } from '@react-navigation/native';
 import {RootState} from '../../store';
 import Error from '../../components/Error';
+import Loading from '../../components/Loading';
 
 function PokemonList() {
   const dispatch = useDispatch();
@@ -30,7 +25,7 @@ function PokemonList() {
     error: pokemonError,
     isLoading: isPokemonDataLoading,
     refetch: refetchPokemonData,
-  } = useGetPokemonListQuery();
+  }: any = useGetPokemonListQuery();
 
   useEffect(() => {
     if (pokemonData) {
@@ -39,11 +34,7 @@ function PokemonList() {
   }, [pokemonData, dispatch]);
 
   if (isPokemonDataLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <Loading />;
   }
 
   if (pokemonError) {
