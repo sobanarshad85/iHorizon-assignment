@@ -15,6 +15,7 @@ import Loading from '../../components/Loading';
 
 type Item = {
   item: Pokemon;
+  index: number;
 };
 
 function PokemonList() {
@@ -37,16 +38,22 @@ function PokemonList() {
     }
   }, [pokemonData, dispatch]);
 
-  if (isPokemonDataLoading) return <Loading />;
   if (pokemonError)
     return <Error retry={refetchPokemonData} error={pokemonError} />;
 
-  const Item = ({item}: Item) => (
-    <PokemonListItem name={item.name} navigation={navigation} />
+  const renderItem = ({item, index}: Item) => (
+    <PokemonListItem name={item.name} index={index} navigation={navigation} />
   );
-  const renderItem = ({item}: Item) => <Item item={item} />;
   const getItem = (data: Pokemon[], index: number) => data[index];
   const getItemCount = (data: Pokemon[]) => data.length;
+  const onEndReached = () => {
+    if (!isPokemonDataLoading) {
+    }
+  };
+  const renderFooter = () => {
+    if (isPokemonDataLoading) return <Loading />;
+    return null;
+  };
   return (
     <View style={styles.container}>
       <VirtualizedList
@@ -54,7 +61,10 @@ function PokemonList() {
         getItemCount={getItemCount}
         getItem={getItem}
         renderItem={renderItem}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.01}
         keyExtractor={item => item.name.toString()}
+        ListFooterComponent={renderFooter}
       />
     </View>
   );
@@ -66,6 +76,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    paddingTop: 10,
   },
   loadingContainer: {
     flex: 1,

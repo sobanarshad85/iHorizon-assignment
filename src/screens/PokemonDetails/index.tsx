@@ -10,7 +10,8 @@ import {RootState} from '../../store';
 import Error from '../../components/Error';
 import Loading from '../../components/Loading';
 
-function PokemonDetails(): JSX.Element {
+function PokemonDetails({route}: {route: any}): JSX.Element {
+  const {index} = route.params;
   const dispatch = useDispatch();
   const pokemonDetailsData = useSelector((state: RootState) =>
     selectPokemonDetails(state),
@@ -20,9 +21,8 @@ function PokemonDetails(): JSX.Element {
     error: pokemonDetailsError,
     isLoading: pokemonDetailsLoading,
     refetch: pokemonDetailsRefetch,
-  }: any = useGetPokemonDetailsQuery(1);
+  }: any = useGetPokemonDetailsQuery(index + 1);
   useEffect(() => {
-    console.warn(pokemonDetails);
     dispatch(fetchPokemonDetails(pokemonDetails));
   }, [pokemonDetails, dispatch]);
 
@@ -35,7 +35,7 @@ function PokemonDetails(): JSX.Element {
     return <Error error={pokemonDetailsError} retry={pokemonDetailsRefetch} />;
   return (
     <View style={styles.container}>
-      <Text style={{flex: 2, textAlign: 'center'}}>Pokemon Details</Text>
+      <Text style={{flex: 2, textAlign: 'center'}}>{pokemonDetails?.name}</Text>
     </View>
   );
 }

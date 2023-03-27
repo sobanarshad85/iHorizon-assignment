@@ -7,14 +7,15 @@ import Separator from './Separator';
 interface Props {
   name: string;
   navigation: NavigationProp<ParamListBase>;
+  index: number;
 }
 
-function PokemonListItem({name, navigation}: Props) {
+function PokemonListItem({name, index, navigation}: Props) {
   const imageUrl =
     'https://images.unsplash.com/photo-1526045612212-70caf35c14df';
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate(POKEMON_DETAILS)}
+      onPress={() => navigation.navigate(POKEMON_DETAILS, {index})}
       style={styles.container}
       key={name}>
       <Separator height={1} />
