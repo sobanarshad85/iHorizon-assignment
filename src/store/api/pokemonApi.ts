@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-interface Pokemon {
+export interface Pokemon {
   name: string;
   url: string;
 }
 
-interface PokemonDetails {
+export interface PokemonDetails {
   name: string;
   sprites: {
     front_default: string;

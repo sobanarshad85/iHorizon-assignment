@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {useGetPokemonListQuery} from '../../store/api/pokemonApi';
+import {Pokemon, useGetPokemonListQuery} from '../../store/api/pokemonApi';
 import {selectPokemonList, fetchPokemonList} from '../../store/pokemonSlice';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, VirtualizedList} from 'react-native';
 import PokemonListItem from '../../components/PokemonListItem';
 import {
   NavigationProp,
@@ -12,6 +12,10 @@ import {
 import {RootState} from '../../store';
 import Error from '../../components/Error';
 import Loading from '../../components/Loading';
+
+type Item = {
+  item: Pokemon;
+};
 
 function PokemonList() {
   const dispatch = useDispatch();
@@ -37,11 +41,21 @@ function PokemonList() {
   if (pokemonError)
     return <Error retry={refetchPokemonData} error={pokemonError} />;
 
+  const Item = ({item}: Item) => (
+    <PokemonListItem name={item.name} navigation={navigation} />
+  );
+  const renderItem = ({item}: Item) => <Item item={item} />;
+  const getItem = (data: Pokemon[], index: number) => data[index];
+  const getItemCount = (data: Pokemon[]) => data.length;
   return (
     <View style={styles.container}>
-      {pokemonList.map(pokemon => (
-        <PokemonListItem name={pokemon.name} navigation={navigation} />
-      ))}
+      <VirtualizedList
+        data={pokemonList}
+        getItemCount={getItemCount}
+        getItem={getItem}
+        renderItem={renderItem}
+        keyExtractor={item => item.name.toString()}
+      />
     </View>
   );
 }
