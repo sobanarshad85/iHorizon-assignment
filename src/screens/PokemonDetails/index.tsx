@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
-import Separator from '../../components/Separator';
+import {View, Text, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {useGetPokemonDetailsQuery} from '../../store/api/pokemonApi';
 import {
@@ -8,14 +7,20 @@ import {
   selectPokemonDetails,
 } from '../../store/pokemonSlice';
 import {RootState} from '../../store';
+import Error from '../../components/Error';
+import Loading from '../../components/Loading';
 
 function PokemonDetails(): JSX.Element {
   const dispatch = useDispatch();
   const pokemonDetailsData = useSelector((state: RootState) =>
     selectPokemonDetails(state),
   );
-  const {data: pokemonDetails, error: pokemonDetailsError} =
-    useGetPokemonDetailsQuery(1);
+  const {
+    data: pokemonDetails,
+    error: pokemonDetailsError,
+    isLoading: pokemonDetailsLoading,
+    refetch: pokemonDetailsRefetch,
+  }: any = useGetPokemonDetailsQuery(1);
   useEffect(() => {
     console.warn(pokemonDetails);
     dispatch(fetchPokemonDetails(pokemonDetails));
@@ -24,6 +29,10 @@ function PokemonDetails(): JSX.Element {
   useEffect(() => {
     console.warn('here it is: ', pokemonDetailsData);
   }, [pokemonDetailsData]);
+
+  if (pokemonDetailsLoading) return <Loading />;
+  if (pokemonDetailsError)
+    return <Error error={pokemonDetailsError} retry={pokemonDetailsRefetch} />;
   return (
     <View style={styles.container}>
       <Text style={{flex: 2, textAlign: 'center'}}>Pokemon Details</Text>

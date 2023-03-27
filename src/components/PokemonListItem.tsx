@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, Image, TouchableOpacity} from 'react-native';
+import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
 import {POKEMON_DETAILS} from '../constants';
 import {NavigationProp, ParamListBase} from '@react-navigation/native';
 import Separator from './Separator';
@@ -15,17 +15,37 @@ function PokemonListItem({name, navigation}: Props) {
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate(POKEMON_DETAILS)}
-      style={{flex: 1}}
+      style={styles.container}
       key={name}>
       <Separator height={1} />
-      <View style={{flexDirection: 'row', paddingVertical: 10, flex: 1}}>
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={styles.subContainer}>
+        <View style={styles.imageContainer}>
           <Image source={{uri: imageUrl}} style={{height: 30, width: 30}} />
         </View>
-        <Text style={{flex: 2, textAlign: 'center'}}>{name}</Text>
+        <Text style={styles.name}>{name}</Text>
       </View>
     </TouchableOpacity>
   );
 }
 
 export default PokemonListItem;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  subContainer: {
+    flexDirection: 'row',
+    paddingVertical: 10,
+    flex: 1,
+  },
+  imageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  name: {
+    flex: 2,
+    textAlign: 'center',
+  },
+});

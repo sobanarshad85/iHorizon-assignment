@@ -33,13 +33,10 @@ function PokemonList() {
     }
   }, [pokemonData, dispatch]);
 
-  if (isPokemonDataLoading) {
-    return <Loading />;
-  }
-
-  if (pokemonError) {
+  if (isPokemonDataLoading) return <Loading />;
+  if (pokemonError)
     return <Error retry={refetchPokemonData} error={pokemonError} />;
-  }
+
   return (
     <View style={styles.container}>
       {pokemonList.map(pokemon => (
