@@ -6,11 +6,13 @@ import {
   ParamListBase,
 } from '@react-navigation/native';
 import {RootState} from '../../store';
-import {Pokemon, useGetPokemonListQuery} from '../../store/api/pokemonApi';
+import {Pokemon, useLazyGetPokemonListQuery} from '../../store/api/pokemonApi';
 import {
   fetchPokemonList,
-  selectPokemonDetails,
-  selectPokemonList,
+  getPokemonsDetails,
+  getPokemonList,
+  getOffset,
+  getNext,
 } from '../../store/pokemonSlice';
 import {View, StyleSheet, VirtualizedList} from 'react-native';
 import PokemonListItem from '../../components/PokemonListItem';
@@ -23,40 +25,41 @@ type Item = {
 };
 
 function PokemonList() {
+  // Hooks
   const dispatch = useDispatch();
-  const navigation: NavigationProp<ParamListBase> = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   // Selectors
-  const pokemonList = useSelector((state: RootState) =>
-    selectPokemonList(state),
-  );
-  const pokemonDetails = useSelector((state: RootState) =>
-    selectPokemonDetails(state),
-  );
+  const pokemonList = useSelector(getPokemonList);
+  const pokemonDetails = useSelector(getPokemonsDetails);
+  const offset = useSelector(getOffset);
+  const next = useSelector(getNext);
 
-  // API Query
-  const {
-    data: pokemonData,
-    error: pokemonError,
-    isLoading: isPokemonDataLoading,
-    refetch: refetchPokemonData,
-  }: any = useGetPokemonListQuery();
+  // Queries
+  const [
+    getPokemonsList,
+    {isLoading: isPokemonDataLoading, isError: pokemonError, data: pokemonData},
+  ] = useLazyGetPokemonListQuery();
 
-  // Fetch data on component mount
+  // Effects
   useEffect(() => {
-    if (pokemonData) {
-      dispatch(fetchPokemonList(pokemonData.results));
+    if (offset === 0) {
+      getPokemonsList(offset);
     }
+  }, [offset]);
+
+  useEffect(() => {
+    pokemonData &&
+      !pokemonError &&
+      dispatch(
+        fetchPokemonList({result: pokemonData.results, next: pokemonData.next}),
+      );
   }, [pokemonData, dispatch]);
 
-  // Error handling
-  if (pokemonError) {
-    return <Error retry={refetchPokemonData} error={pokemonError} />;
-  }
-
-  // Render functions
+  // Functions
   const renderItem = ({item, index}: Item) => {
     const image = pokemonDetails[index + 1]?.sprites?.front_default;
+
     return (
       <PokemonListItem
         url={image}
@@ -74,30 +77,36 @@ function PokemonList() {
     return null;
   };
 
-  // VirtualizedList
   const getItem = (data: Pokemon[], index: number) => data[index];
   const getItemCount = (data: Pokemon[]) => data.length;
   const onEndReached = () => {
-    // TODO: Perform action on end reached
+    if (!isPokemonDataLoading && next) {
+      getPokemonsList(offset);
+    }
   };
+
+  // Render
+  if (pokemonError) {
+    return (
+      <Error retry={() => getPokemonsList(offset - 1)} error={pokemonError} />
+    );
+  }
 
   return (
     <View style={styles.container}>
       <VirtualizedList
         data={pokemonList}
-        getItemCount={getItemCount}
         getItem={getItem}
-        renderItem={renderItem}
-        onEndReached={onEndReached}
-        onEndReachedThreshold={0.01}
+        getItemCount={getItemCount}
         keyExtractor={item => item.name.toString()}
         ListFooterComponent={renderFooter}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.0001}
+        renderItem={renderItem}
       />
     </View>
   );
 }
-
-export default PokemonList;
 
 const styles = StyleSheet.create({
   container: {
@@ -111,3 +120,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default PokemonList;

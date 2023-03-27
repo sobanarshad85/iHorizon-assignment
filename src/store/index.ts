@@ -29,4 +29,5 @@ const store = configureStore({
     getDefaultMiddleware().concat(pokemonApi.middleware, logger),
 });
 setupListeners(store.dispatch);
+export type RootState = ReturnType<typeof reducers>;
 export default store;

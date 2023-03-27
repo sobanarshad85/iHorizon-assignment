@@ -10,7 +10,7 @@ export interface PokemonDetails {
   height: number;
   id: number;
   weight: number;
-  types: { type: { name: string } }[]
+  types: { type: { name: string } }[];
   sprites: {
     front_default: string;
   };
@@ -21,14 +21,17 @@ export const pokemonApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://pokeapi.co/api/v2/',
   }),
-  endpoints: (builder) => ({
-    getPokemonList: builder.query<Pokemon[], void>({
-      query: () => 'pokemon/',
-    }),
-    getPokemonDetails: builder.query<PokemonDetails, number>({
-      query: (id) => `pokemon/${id}/`,
-    }),
-  }),
+  endpoints: (builder) => {
+    return {
+      getPokemonList: builder.query<any, number>({
+        query: (offset = 0) => `pokemon?offset=${offset * 30}&limit=30`,
+      }),
+
+      getPokemonDetails: builder.query<PokemonDetails, number>({
+        query: (id) => `pokemon/${id}/`,
+      }),
+    };
+  },
 });
 
-export const { useGetPokemonListQuery, useLazyGetPokemonDetailsQuery } = pokemonApi;
+export const { useLazyGetPokemonDetailsQuery, useLazyGetPokemonListQuery } = pokemonApi;

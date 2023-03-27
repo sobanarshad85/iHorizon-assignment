@@ -1,15 +1,15 @@
 import React, {useEffect} from 'react';
 import {View, Image, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../store';
 import {
   PokemonDetails as PD,
   useLazyGetPokemonDetailsQuery,
 } from '../../store/api/pokemonApi';
 import {
   fetchPokemonDetails,
-  selectPokemonDetails,
+  getPokemonsDetails,
 } from '../../store/pokemonSlice';
-import {RootState} from '../../store';
 import Error from '../../components/Error';
 import Loading from '../../components/Loading';
 import PokemonRow from '../../components/PokemonRow';
@@ -19,12 +19,12 @@ interface Props {
 }
 
 function PokemonDetails({route}: Props): JSX.Element {
-  const {index} = route.params;
   const dispatch = useDispatch();
+  const {index} = route.params;
   const pokemonId = index + 1;
 
   const pokemonDetailsData = useSelector((state: RootState) =>
-    selectPokemonDetails(state),
+    getPokemonsDetails(state),
   );
   const pokemon = pokemonDetailsData[pokemonId];
 
@@ -38,14 +38,20 @@ function PokemonDetails({route}: Props): JSX.Element {
   ] = useLazyGetPokemonDetailsQuery();
 
   useEffect(() => {
-    !pokemon && getPokemonDetails(pokemonId);
+    if (!pokemon) {
+      getPokemonDetails(pokemonId);
+    }
   }, [pokemon]);
 
   useEffect(() => {
-    pokemonDetails && dispatch(fetchPokemonDetails(pokemonDetails));
+    if (pokemonDetails && !pokemonDetailsError) {
+      dispatch(fetchPokemonDetails(pokemonDetails));
+    }
   }, [pokemonDetails, dispatch]);
 
-  if (pokemonDetailsLoading) return <Loading />;
+  if (pokemonDetailsLoading) {
+    return <Loading />;
+  }
 
   if (pokemonDetailsError) {
     return (
@@ -64,13 +70,11 @@ function PokemonDetails({route}: Props): JSX.Element {
       />
       <PokemonRow title={'Name'} value={pokemon?.name} />
       <PokemonRow title={'Height'} value={pokemon?.height} />
-      <PokemonRow title={'Weight'} value={pokemon?.weight + ' kg'} />
+      <PokemonRow title={'Weight'} value={`${pokemon?.weight} kg`} />
       <PokemonRow title={'Types'} value={pokemon?.types} />
     </View>
   );
 }
-
-export default PokemonDetails;
 
 const styles = StyleSheet.create({
   container: {
@@ -82,3 +86,5 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
+
+export default PokemonDetails;
